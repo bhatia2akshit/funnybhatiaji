@@ -20,8 +20,8 @@ templates = Jinja2Templates(directory="templates")
 def index(request: Request):
     bots = []
     bot_directories = [d for d in os.listdir(bots_dir) if os.path.isdir(os.path.join(bots_dir, d))]
-    for bot_dir in bot_directories:
-
+    for bot_dir in [bot_directories[0],'funnybhatiaji']:
+        print(bot_dir)
         # Dynamically load the bot's module
         spec = importlib.util.spec_from_file_location("bot", os.path.join(bots_dir, bot_dir, "joke_bot.py"))
         bot_module = importlib.util.module_from_spec(spec)
@@ -31,8 +31,13 @@ def index(request: Request):
         bot = bot_module.Bot()
         bots.append(bot)
     jokes = {}
+    joke = ''
     for bot in bots:
-        jokes[bot.name] = bot.tell_joke()
+        if joke and bot.name == 'funnybhatiaji':
+            joke = bot.tell_joke(joke)
+        else:
+            joke = bot.tell_joke()
+        jokes[bot.name] = joke
     return templates.TemplateResponse("index.html", {"request": request, "title": "Comedy-club",
                                                      "placeholder": "Welcome", "jokes": jokes})
 
